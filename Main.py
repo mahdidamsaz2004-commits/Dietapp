@@ -8,7 +8,6 @@ def main(page: ft.Page):
     page.scroll = "auto"
     page.padding = 20
 
-    # المان‌های ورودی
     height_field = ft.TextField(label="قد (سانتی‌متر)", prefix_icon=ft.icons.HEIGHT, keyboard_type=ft.KeyboardType.NUMBER)
     weight_field = ft.TextField(label="وزن فعلی (کیلوگرم)", prefix_icon=ft.icons.MONITOR_WEIGHT, keyboard_type=ft.KeyboardType.NUMBER)
     age_field = ft.TextField(label="سن", prefix_icon=ft.icons.CAKE, keyboard_type=ft.KeyboardType.NUMBER)
@@ -33,19 +32,16 @@ def main(page: ft.Page):
                 page.update()
                 return
 
-            # ۱. محاسبات پایه
             bmi_target = 23 if gender == "agha" else 22
             ibw = bmi_target * (h ** 2)
             aibw = ((w - ibw) / 3) + ibw
             tdee = aibw * 1.1 * 1.3 * 24
             target_cal = max(tdee - 1000, 1200)
 
-            # ۲. درشت‌مغذی‌ها
             cho_g = (target_cal * 0.53) / 4
             pro_g = (target_cal * 0.17) / 4
             fat_g = (target_cal * 0.30) / 9
 
-            # ۳. محاسبه واحدها
             u_milk, u_veg = 2, 3
             u_fruit = 4 if target_cal > 1800 else (3 if target_cal > 1500 else 2)
 
@@ -56,12 +52,10 @@ def main(page: ft.Page):
                 fat_u = max(round((fat - (u_milk * 3) - (meat * 3)) / 5), 3)
                 return bread, meat, fat_u
 
-            # محاسبه دو حالت
             b1, m1, f1 = get_units(cho_g, pro_g, fat_g, 0)
             u_sugar = max(round((target_cal * 0.05) / 20), 1)
             b2, m2, f2 = get_units(cho_g, pro_g, fat_g, u_sugar)
 
-            # نمایش نتایج با طراحی کارت‌ولی
             results_container.controls.clear()
             results_container.controls.append(
                 ft.Card(
@@ -91,27 +85,23 @@ def main(page: ft.Page):
                 )
 
             results_container.controls.append(create_diet_card("رژیم استاندارد (بدون قند)", b1, m1, 0, ft.colors.BLUE))
-            results_container.controls.append(create_diet_card("رژیم با قند ساده (خرما/عسل)", b2, m2, u_sugar, ft.colors.ORANGE))
+            results_container.controls.append(create_diet_card("رژیم با قند ساده", b2, m2, u_sugar, ft.colors.ORANGE))
             
             page.update()
 
         except Exception as ex:
             print(ex)
 
-    # بدنه اصلی اپلیکیشن
     page.add(
-        ft.Text("محاسبه‌گر رژیم علمی", size=28, weight="bold", color=ft.colors.BLUE_800),
-        ft.Text("اطلاعات خود را وارد کنید:"),
+        ft.Text("محاسبه‌گر رژیم", size=28, weight="bold", color=ft.colors.BLUE_800),
         height_field,
         weight_field,
         age_field,
-        ft.Text("جنسیت:"),
         gender_radio,
         ft.ElevatedButton(
             "تولید برنامه رژیم",
             icon=ft.icons.CALCULATE,
             on_click=calculate_diet,
-            style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)),
             height=50,
             width=400
         ),
