@@ -5,18 +5,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # به‌روزرسانی به نسخه 4
+      - uses: actions/checkout@v4
+
+      - name: Get Date
+        id: get-date
+        run: |
+          echo "date=$(date +'%Y-%m-%d-%H;%M;%S')" >> $GITHUB_OUTPUT
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip3 install --user --upgrade buildozer cython virtualenv
 
       - name: Build with Buildozer
-        # استفاده از اکشن رسمی و معتبرتر
-        uses: pypa/buildozer-action@v1 
-        with:
-          workdir: .
-          buildozer_version: master
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          buildozer android debug
 
       - name: Upload APK
-        # به‌روزرسانی به نسخه 4 برای رفع ارور Deprecation
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
-          name: DietApp-Installer
+          name: DietApp-${{ steps.get-date.outputs.date }}
           path: bin/*.apk
