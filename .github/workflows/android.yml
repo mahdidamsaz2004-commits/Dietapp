@@ -5,16 +5,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
+      - uses: actions/checkout@v4 # به‌روزرسانی به نسخه 4
+
       - name: Build with Buildozer
-        uses: ArtemSerebriakov/buildozer-action@v1
+        # استفاده از اکشن رسمی و معتبرتر
+        uses: pypa/buildozer-action@v1 
         with:
           workdir: .
           buildozer_version: master
-          
+
       - name: Upload APK
-        uses: actions/upload-artifact@v2
+        # به‌روزرسانی به نسخه 4 برای رفع ارور Deprecation
+        uses: actions/upload-artifact@v4 
         with:
-          name: DietApp-APK
+          name: DietApp-Installer
           path: bin/*.apk
