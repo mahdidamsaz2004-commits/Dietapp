@@ -1,30 +1,41 @@
-name: Build Android APK
+name: Build Diet App APK
 on: [push]
+
+env:
+  # این خط اخطار Node.js گیت‌هاب را برطرف می‌کند
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "date=$(date +'%Y-%m-%d-%H;%M;%S')" >> $GITHUB_OUTPUT
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-      - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-          pip3 install --user --upgrade buildozer cython virtualenv
+      - name: Setup Flutter (Required for Flet)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
 
-      - name: Build with Buildozer
-        run: |
-          export PATH=$PATH:$HOME/.local/bin
-          buildozer android debug
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install flet
+
+      - name: Build APK with Flet
+        run: flet build apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DietApp-${{ steps.get-date.outputs.date }}
-          path: bin/*.apk
+          name: DietMaster-APK
+          path: build/apk/**/*.apk
